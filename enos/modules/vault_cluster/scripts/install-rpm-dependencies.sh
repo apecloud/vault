@@ -9,7 +9,7 @@ set -ex -o pipefail
 # non-root user (known bug).
 sudo cloud-init status --wait
 
-if [ "$ARCH" == "aarch64" ] && [ "$PACKAGE_MANAGER" == "zypper" ]; then
+if [ "$PACKAGE_MANAGER" == "zypper" ]; then
 
   echo "Installing dependencies libcap-progs and openssl"
   sudo zypper install --no-confirm libcap-progs
