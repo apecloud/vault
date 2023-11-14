@@ -10,7 +10,6 @@ set -ex -o pipefail
 sudo cloud-init status --wait
 
 if [ "$PACKAGE_MANAGER" == "zypper" ]; then
-
   echo "Installing dependencies libcap-progs and openssl"
   sudo zypper install --no-confirm libcap-progs
   sudo zypper install --no-confirm openssl

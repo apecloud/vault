@@ -73,7 +73,7 @@ resource "enos_bundle_install" "consul" {
   }
 }
 
-# For openSUSE Leap on arm64 architecture, we need to manually install some
+# For SUSE distros (Leap and SLES), we need to manually install some
 # packages in order to install Vault RPM packages later.
 resource "enos_remote_exec" "install_rpm_dependencies" {
   for_each = {
