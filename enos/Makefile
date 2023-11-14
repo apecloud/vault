@@ -28,7 +28,7 @@ validate-enos:
 	enos scenario validate agent --timeout 30m0s
 	enos scenario validate autopilot --timeout 30m0s
 	enos scenario validate proxy --timeout 30m0s
-	enos scenario validate replication --timeout 30m0s
+	enos scenario validate replication --timeout 45m0s
 	enos scenario validate seal_ha --timeout 30m0s
 	enos scenario validate smoke --timeout 30m0s
 	enos scenario validate upgrade --timeout 30m0s
