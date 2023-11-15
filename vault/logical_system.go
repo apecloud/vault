@@ -141,6 +141,8 @@ func NewSystemBackend(core *Core, logger log.Logger, config *logical.BackendConf
 				"wrapping/pubkey",
 				"replication/status",
 				"internal/specs/openapi",
+				"internal/ui/custom-messages",
+				"internal/ui/custom-messages/*",
 				"internal/ui/mounts",
 				"internal/ui/mounts/*",
 				"internal/ui/namespaces",
@@ -5498,6 +5500,19 @@ func checkListingVisibility(visibility ListingVisibilityType) error {
 	}
 
 	return nil
+}
+
+func (b *SystemBackend) handleListCustomMessages(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
+	return logical.ListResponseWithInfo([]string{"message-1"}, map[string]any{
+		"message-1": map[string]any{
+			"title":         "First Message",
+			"type":          "banner",
+			"authenticated": true,
+			"start_time":    time.Now().Add(-1 * time.Hour).Format(time.RFC3339Nano),
+			"end_time":      time.Now().Add(24 * time.Hour).Format(time.RFC3339Nano),
+			"active":        true,
+		},
+	}), nil
 }
 
 const sysHelpRoot = `

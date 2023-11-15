@@ -4,6 +4,7 @@
 package vault
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -251,7 +252,197 @@ func (b *SystemBackend) configPaths() []*framework.Path {
 			HelpDescription: strings.TrimSpace(sysHelp["config/ui/headers"][0]),
 			HelpSynopsis:    strings.TrimSpace(sysHelp["config/ui/headers"][1]),
 		},
+		{
+			Pattern: "config/ui/custom-messages/$",
 
+			DisplayAttrs: &framework.DisplayAttributes{
+				OperationPrefix: "ui-config",
+				OperationVerb:   "list",
+				OperationSuffix: "custom-messages",
+			},
+			ExistenceCheck: func(context.Context, *logical.Request, *framework.FieldData) (bool, error) { return false, nil },
+
+			Operations: map[logical.Operation]framework.OperationHandler{
+				logical.ListOperation: &framework.PathOperation{
+					Callback: b.handleListCustomMessages,
+					Summary:  "Lists custom messages",
+					Responses: map[int][]framework.Response{
+						http.StatusOK: {{
+							Description: "OK",
+							Fields: map[string]*framework.FieldSchema{
+								"authenticated": {
+									Type:     framework.TypeBool,
+									Required: false,
+								},
+								"active": {
+									Type:     framework.TypeBool,
+									Required: false,
+								},
+								"type": {
+									Type:     framework.TypeString,
+									Required: false,
+								},
+							},
+						}},
+					},
+				},
+				logical.CreateOperation: &framework.PathOperation{
+					Callback: func(context.Context, *logical.Request, *framework.FieldData) (*logical.Response, error) {
+						return &logical.Response{}, nil
+					}, // Temporary placeholder until a real handler is defined.
+					Summary: "Create custom message",
+					Responses: map[int][]framework.Response{
+						http.StatusOK: {{
+							Description: "OK",
+							Fields: map[string]*framework.FieldSchema{
+								"title": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"authenticated": {
+									Type:     framework.TypeBool,
+									Required: true,
+								},
+								"type": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"message": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"link": {
+									Type:     framework.TypeMap,
+									Required: false,
+								},
+								"start_time": {
+									Type:     framework.TypeTime,
+									Required: true,
+								},
+								"end_time": {
+									Type:     framework.TypeTime,
+									Required: true,
+								},
+							},
+						}},
+					},
+
+					DisplayAttrs: &framework.DisplayAttributes{
+						OperationVerb:   "create",
+						OperationSuffix: "custom-message",
+					},
+				},
+			},
+		},
+		{
+			Pattern: "config/ui/custom-messages/" + framework.MatchAllRegex("id"),
+			Fields: map[string]*framework.FieldSchema{
+				"id": {
+					Type:        framework.TypeString,
+					Description: "The unique identifier for the custom message",
+				},
+			},
+			DisplayAttrs: &framework.DisplayAttributes{
+				OperationPrefix: "ui-config",
+				OperationSuffix: "custom-message",
+			},
+			Operations: map[logical.Operation]framework.OperationHandler{
+				logical.ReadOperation: &framework.PathOperation{
+					Callback: func(context.Context, *logical.Request, *framework.FieldData) (*logical.Response, error) {
+						return &logical.Response{}, nil
+					}, // Temporary placeholder until a real handler is defined.
+					Summary: "Read custom message",
+
+					Responses: map[int][]framework.Response{
+						http.StatusOK: {{
+							Description: "OK",
+							Fields: map[string]*framework.FieldSchema{
+								"id": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+							},
+						}},
+					},
+
+					DisplayAttrs: &framework.DisplayAttributes{
+						OperationVerb: "read",
+					},
+				},
+				logical.DeleteOperation: &framework.PathOperation{
+					Callback: func(context.Context, *logical.Request, *framework.FieldData) (*logical.Response, error) {
+						return &logical.Response{}, nil
+					}, // Temporary placeholder until a real handler is defined.
+					Summary: "Delete custom message",
+
+					Responses: map[int][]framework.Response{
+						http.StatusNoContent: {{
+							Description: "OK",
+							Fields: map[string]*framework.FieldSchema{
+								"id": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+							},
+						}},
+					},
+
+					DisplayAttrs: &framework.DisplayAttributes{
+						OperationVerb: "delete",
+					},
+				},
+				logical.UpdateOperation: &framework.PathOperation{
+					Callback: func(context.Context, *logical.Request, *framework.FieldData) (*logical.Response, error) {
+						return &logical.Response{}, nil
+					}, // Temporary placeholder until a real handler is defined.
+					Summary: "Update custom message",
+
+					Responses: map[int][]framework.Response{
+						http.StatusOK: {{
+							Description: "OK",
+							Fields: map[string]*framework.FieldSchema{
+								"id": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"title": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"authenticated": {
+									Type:     framework.TypeBool,
+									Required: true,
+								},
+								"type": {
+									Type:     framework.TypeBool,
+									Required: true,
+								},
+								"message": {
+									Type:     framework.TypeString,
+									Required: true,
+								},
+								"link": {
+									Type:     framework.TypeMap,
+									Required: false,
+								},
+								"start_time": {
+									Type:     framework.TypeTime,
+									Required: true,
+								},
+								"end_time": {
+									Type:     framework.TypeTime,
+									Required: true,
+								},
+								"options": {
+									Type:     framework.TypeMap,
+									Required: false,
+								},
+							},
+						}},
+					},
+				},
+			},
+		},
 		{
 			Pattern: "generate-root(/attempt)?$",
 
