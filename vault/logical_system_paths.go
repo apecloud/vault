@@ -260,7 +260,6 @@ func (b *SystemBackend) configPaths() []*framework.Path {
 				OperationVerb:   "list",
 				OperationSuffix: "custom-messages",
 			},
-			ExistenceCheck: func(context.Context, *logical.Request, *framework.FieldData) (bool, error) { return false, nil },
 
 			Operations: map[logical.Operation]framework.OperationHandler{
 				logical.ListOperation: &framework.PathOperation{
@@ -286,11 +285,22 @@ func (b *SystemBackend) configPaths() []*framework.Path {
 						}},
 					},
 				},
+			},
+		},
+		{
+			Pattern:        "config/ui/custom-messages$",
+			ExistenceCheck: func(context.Context, *logical.Request, *framework.FieldData) (bool, error) { return false, nil },
+
+			DisplayAttrs: &framework.DisplayAttributes{
+				OperationPrefix: "ui-config",
+				OperationVerb:   "create",
+				OperationSuffix: "custom-message",
+			},
+
+			Operations: map[logical.Operation]framework.OperationHandler{
 				logical.CreateOperation: &framework.PathOperation{
-					Callback: func(context.Context, *logical.Request, *framework.FieldData) (*logical.Response, error) {
-						return &logical.Response{}, nil
-					}, // Temporary placeholder until a real handler is defined.
-					Summary: "Create custom message",
+					Callback: b.handleCreateCustomMessages,
+					Summary:  "Create custom message",
 					Responses: map[int][]framework.Response{
 						http.StatusOK: {{
 							Description: "OK",
@@ -325,11 +335,6 @@ func (b *SystemBackend) configPaths() []*framework.Path {
 								},
 							},
 						}},
-					},
-
-					DisplayAttrs: &framework.DisplayAttributes{
-						OperationVerb:   "create",
-						OperationSuffix: "custom-message",
 					},
 				},
 			},

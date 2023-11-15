@@ -30,6 +30,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-secure-stdlib/parseutil"
 	"github.com/hashicorp/go-secure-stdlib/strutil"
+	"github.com/hashicorp/go-uuid"
 	semver "github.com/hashicorp/go-version"
 	"github.com/hashicorp/vault/helper/experiments"
 	"github.com/hashicorp/vault/helper/hostutil"
@@ -5513,6 +5514,80 @@ func (b *SystemBackend) handleListCustomMessages(ctx context.Context, req *logic
 			"active":        true,
 		},
 	}), nil
+}
+
+func (b *SystemBackend) handleCreateCustomMessages(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
+	var id string
+	var err error
+
+	if id, err = uuid.GenerateUUID(); err != nil {
+		return logical.ErrorResponse("failed to generate unique id for custom message", err), nil
+	}
+
+	var authenticated bool
+	if authenticatedValue, ok := req.Data["authenticated"]; ok {
+		authenticated = authenticatedValue.(bool)
+	}
+
+	var typeStr string
+	if typeValue, ok := req.Data["type"]; ok {
+		typeStr = typeValue.(string)
+	}
+
+	var message string
+	if messageValue, ok := req.Data["message"]; ok {
+		message = messageValue.(string)
+	}
+
+	var startTime time.Time
+	var startTimeStr string
+	if startTimeValue, ok := req.Data["start_time"]; ok {
+		startTimeStr = startTimeValue.(string)
+
+		if startTime, err = time.Parse(time.RFC3339Nano, startTimeStr); err != nil {
+			return logical.ErrorResponse("invalid start time", err), nil
+		}
+	}
+
+	var endTime time.Time
+	var endTimeStr string
+	if endTimeValue, ok := req.Data["end_time"]; ok {
+		endTimeStr = endTimeValue.(string)
+
+		if endTime, err = time.Parse(time.RFC3339Nano, endTimeStr); err != nil {
+			return logical.ErrorResponse("invalid end time", err), nil
+		}
+	}
+
+	linkMap := make(map[string]any)
+	if linkMapValue, ok := req.Data["link"]; ok {
+		if m, ok := linkMapValue.(map[string]any); ok {
+			for k, v := range m {
+				linkMap[k] = v
+			}
+		}
+	}
+
+	active := true
+	if startTime.After(time.Now()) || endTime.Before(time.Now()) {
+		active = false
+	}
+
+	return &logical.Response{
+		Data: map[string]any{
+			"id": id,
+			"data": map[string]any{
+				"authenticated": authenticated,
+				"type":          typeStr,
+				"message":       message,
+				"start_time":    startTimeStr,
+				"end_time":      endTimeStr,
+				"link":          linkMap,
+				"options":       map[string]any{},
+				"active":        active,
+			},
+		},
+	}, nil
 }
 
 const sysHelpRoot = `
